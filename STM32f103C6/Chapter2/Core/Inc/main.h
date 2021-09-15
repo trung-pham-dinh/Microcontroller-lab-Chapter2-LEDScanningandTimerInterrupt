@@ -74,6 +74,11 @@ void Error_Handler(void);
 #define EN_PORT GPIOA
 #define EN0 GPIO_PIN_6
 #define EN1 GPIO_PIN_7
+#define EN2 GPIO_PIN_8
+#define EN3 GPIO_PIN_9
+
+#define DOT_PORT GPIOA
+#define DOT GPIO_PIN_4
 
 /* USER CODE END Private defines */
 
