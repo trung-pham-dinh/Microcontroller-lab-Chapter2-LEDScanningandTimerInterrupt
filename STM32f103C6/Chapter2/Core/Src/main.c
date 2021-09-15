@@ -46,14 +46,18 @@ TIM_HandleTypeDef htim2;
 int mil_1000 = 1;
 int mil_500 = 1;
 
+const int MAX_LED = 4;
+int index_led = 0;
+int led_buffer [4] = {1, 2, 3, 4};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_TIM2_Init(void);
 static void MX_GPIO_Init(void);
-/* USER CODE BEGIN PFP */
 
+/* USER CODE BEGIN PFP */
+void update7SEG(int);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -273,33 +277,34 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*htim) {
 	if(mil_500 == 0) {
 		mil_500 = 50;
 
-		HAL_GPIO_WritePin(EN_PORT, EN0 | EN1 | EN2 | EN3, 1);
-		switch(led) {
-		case 0:
-			HAL_GPIO_WritePin(EN_PORT, EN0, 0);
-			display7SEG(1);
-			led = 1;
-			break;
-		case 1:
-			HAL_GPIO_WritePin(EN_PORT, EN1, 0);
-			display7SEG(2);
-			led = 2;
-			break;
-		case 2:
-			HAL_GPIO_WritePin(EN_PORT, EN2, 0);
-			display7SEG(3);
-			led = 3;
-			break;
-		case 3:
-			HAL_GPIO_WritePin(EN_PORT, EN3, 0);
-			display7SEG(0);
-			led = 0;
-			break;
-		}
+		update7SEG(index_led++);
+		if(index_led == MAX_LED) index_led = 0;
 	}
 	if(mil_1000 == 0) {
 		mil_1000 = 100;
 		HAL_GPIO_TogglePin(DOT_PORT, DOT);
+	}
+}
+
+void update7SEG(int index) {
+	HAL_GPIO_WritePin(EN_PORT, EN0 | EN1 | EN2 | EN3, 1);
+	display7SEG(led_buffer[index]);
+
+	switch(index) {
+	case 0:
+		HAL_GPIO_WritePin(EN_PORT, EN0, 0);
+		break;
+	case 1:
+		HAL_GPIO_WritePin(EN_PORT, EN1, 0);
+		break;
+	case 2:
+		HAL_GPIO_WritePin(EN_PORT, EN2, 0);
+		break;
+	case 3:
+		HAL_GPIO_WritePin(EN_PORT, EN3, 0);
+		break;
+	default:
+		break;
 	}
 }
 /* USER CODE END 4 */
