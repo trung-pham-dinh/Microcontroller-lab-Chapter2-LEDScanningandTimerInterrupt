@@ -43,18 +43,18 @@
 TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
-int mil_1000 = 1;
-int mil_500 = 1;
-
 const int MAX_LED = 4;
 int index_led = 0;
 int led_buffer [4] = {0, 0, 0, 0};
 
 int hour = 15, minute = 8, second = 50;
 
+int TIMER_CYCLE = 10;
 int timer0_counter = 0;
 int timer0_flag = 0;
-int TIMER_CYCLE = 10;
+int timer1_counter = 0;
+int timer1_flag = 0;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,6 +67,7 @@ void update7SEG(int);
 void updateClockBuffer(void);
 void display7SEG(int);
 void setTimer0(int);
+void setTimer1(int);
 void timer_run(void);
 /* USER CODE END PFP */
 
@@ -110,10 +111,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  setTimer0(1000);
+  setTimer0(10);
+  setTimer1(10);
   while (1)
   {
-	  if(timer0_flag == 1) {
+	  if(timer0_flag) {
 		  timer0_flag = 0;
 		  setTimer0(1000);
 
@@ -132,6 +134,13 @@ int main(void)
 			  hour = 0;
 		  }
 		  updateClockBuffer();
+	  }
+	  if(timer1_flag) {
+		  timer1_flag = 0;
+		  setTimer1(250);
+
+		  update7SEG(index_led++);
+		  if(index_led == MAX_LED) index_led = 0;
 	  }
 
     /* USER CODE END WHILE */
@@ -332,12 +341,23 @@ void setTimer0(int duration) {
 	timer0_counter = duration / TIMER_CYCLE;
 	timer0_flag = 0;
 }
+void setTimer1(int duration) {
+	timer1_counter = duration / TIMER_CYCLE;
+	timer1_flag = 0;
+}
 
 void timer_run() {
 	if(timer0_counter > 0) {
 		timer0_counter--;
 		if(timer0_counter == 0) {
 			timer0_flag = 1;
+		}
+	}
+
+	if(timer1_counter > 0) {
+		timer1_counter--;
+		if(timer1_counter == 0) {
+			timer1_flag = 1;
 		}
 	}
 }
