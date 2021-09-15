@@ -51,6 +51,10 @@ int index_led = 0;
 int led_buffer [4] = {0, 0, 0, 0};
 
 int hour = 15, minute = 8, second = 50;
+
+int timer0_counter = 0;
+int timer0_flag = 0;
+int TIMER_CYCLE = 10;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -62,6 +66,8 @@ static void MX_GPIO_Init(void);
 void update7SEG(int);
 void updateClockBuffer(void);
 void display7SEG(int);
+void setTimer0(int);
+void timer_run(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -104,23 +110,27 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-
+  setTimer0(1000);
   while (1)
   {
-	  second++;
-	  if(second >= 60) {
-		  second = 0;
-		  minute++;
+//	  second++;
+//	  if(second >= 60) {
+//		  second = 0;
+//		  minute++;
+//	  }
+//	  if(minute >= 60) {
+//		  minute = 0;
+//		  hour++;
+//	  }
+//	  if(hour >= 24) {
+//		  hour = 0;
+//	  }
+//	  updateClockBuffer();
+//	  HAL_Delay(1000);
+	  if(timer0_flag == 1) {
+		  HAL_GPIO_TogglePin(RLED_PORT, RLED1);
+		  setTimer0(2000);
 	  }
-	  if(minute >= 60) {
-		  minute = 0;
-		  hour++;
-	  }
-	  if(hour >= 24) {
-		  hour = 0;
-	  }
-	  updateClockBuffer();
-	  HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -317,19 +327,22 @@ void updateClockBuffer() {
 	led_buffer[3] = minute % 10;
 }
 
+void setTimer0(int duration) {
+	timer0_counter = duration / TIMER_CYCLE;
+	timer0_flag = 0;
+}
+
+void timer_run() {
+	if(timer0_counter > 0) {
+		timer0_counter--;
+		if(timer0_counter == 0) {
+			timer0_flag = 1;
+		}
+	}
+}
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*htim) {
-	mil_1000--; mil_500--;
-
-	if(mil_500 == 0) {
-		mil_500 = 50;
-
-		update7SEG(index_led++);
-		if(index_led == MAX_LED) index_led = 0;
-	}
-	if(mil_1000 == 0) {
-		mil_1000 = 100;
-		HAL_GPIO_TogglePin(DOT_PORT, DOT);
-	}
+	timer_run();
 }
 /* USER CODE END 4 */
 
