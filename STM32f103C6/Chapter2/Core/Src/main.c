@@ -56,7 +56,9 @@ uint16_t row_pin[8] = {ROW0,ROW1,ROW2,ROW3,ROW4,ROW5,ROW6,ROW7};
 uint16_t col_pin[8] = {ENM0,ENM1,ENM2,ENM3,ENM4,ENM5,ENM6,ENM7};
 
 
-int TIMER_CYCLE = 10;
+
+int TIMER_CYCLE = 1;
+
 int timer0_counter = 0;
 int timer0_flag = 0;
 
@@ -164,7 +166,7 @@ int main(void)
 	  }
 	  if(timer2_flag) {
 		  timer2_flag = 0;
-		  setTimer2(10);
+		  setTimer2(3);
 
 		  updateLEDMatrix(index_led_matrix++);
 		  if(index_led_matrix == MAX_LED_MATRIX) index_led_matrix = 0;
@@ -231,7 +233,7 @@ static void MX_TIM2_Init(void)
 
   /* USER CODE END TIM2_Init 1 */
   htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 7999;
+  htim2.Init.Prescaler = 799;
   htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim2.Init.Period = 9;
   htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
