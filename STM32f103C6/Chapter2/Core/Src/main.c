@@ -52,6 +52,8 @@ int hour = 15, minute = 8, second = 50;
 const int MAX_LED_MATRIX = 8;
 int index_led_matrix = 0;
 uint8_t matrix_buffer[8] = {0x01, 0x06, 0x38, 0xC8, 0xC8, 0x38, 0x06, 0x01};
+uint8_t charA[8] = {0x01, 0x06, 0x38, 0xC8, 0xC8, 0x38, 0x06, 0x01};
+
 uint16_t row_pin[8] = {ROW0,ROW1,ROW2,ROW3,ROW4,ROW5,ROW6,ROW7};
 uint16_t col_pin[8] = {ENM0,ENM1,ENM2,ENM3,ENM4,ENM5,ENM6,ENM7};
 
@@ -79,6 +81,7 @@ void update7SEG(int);
 void updateClockBuffer(void);
 void display7SEG(int);
 void updateLEDMatrix(int);
+void shiftLeftMatrix(void);
 
 void setTimer0(int);
 void setTimer1(int);
@@ -161,12 +164,14 @@ int main(void)
 		  timer1_flag = 0;
 		  setTimer1(250);
 
+		  shiftLeftMatrix();
 		  update7SEG(index_led++);
 		  if(index_led == MAX_LED) index_led = 0;
 	  }
 	  if(timer2_flag) {
 		  timer2_flag = 0;
 		  setTimer2(3);
+
 
 		  updateLEDMatrix(index_led_matrix++);
 		  if(index_led_matrix == MAX_LED_MATRIX) index_led_matrix = 0;
@@ -382,6 +387,23 @@ void updateLEDMatrix(int index) {
 	}
 
 	HAL_GPIO_WritePin(ENM_PORT, col_pin[index], 0);
+}
+void shiftLeftMatrix() {
+	static int shamt = 0;
+
+	for(int i = 0; i < MAX_LED_MATRIX; i++) {
+		if(i+shamt < MAX_LED_MATRIX) {
+			matrix_buffer[i] = charA[i+shamt];
+		}
+		else {
+			matrix_buffer[i] = 0x0;
+		}
+	}
+
+	shamt++;
+	if(shamt == MAX_LED_MATRIX) {
+		shamt = 0;
+	}
 }
 
 void updateClockBuffer() {
