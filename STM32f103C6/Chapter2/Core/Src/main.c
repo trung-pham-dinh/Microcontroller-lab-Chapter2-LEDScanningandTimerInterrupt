@@ -51,7 +51,7 @@ int hour = 15, minute = 8, second = 50;
 
 const int MAX_LED_MATRIX = 8;
 int index_led_matrix = 0;
-uint8_t matrix_buffer[8] = {0x01, 0x07, 0x70, 0xA0, 0xA0, 0x70, 0x07, 0x01};
+uint8_t matrix_buffer[8] = {0x01, 0x06, 0x38, 0xC8, 0xC8, 0x38, 0x06, 0x01};
 uint16_t row_pin[8] = {ROW0,ROW1,ROW2,ROW3,ROW4,ROW5,ROW6,ROW7};
 uint16_t col_pin[8] = {ENM0,ENM1,ENM2,ENM3,ENM4,ENM5,ENM6,ENM7};
 
@@ -59,8 +59,12 @@ uint16_t col_pin[8] = {ENM0,ENM1,ENM2,ENM3,ENM4,ENM5,ENM6,ENM7};
 int TIMER_CYCLE = 10;
 int timer0_counter = 0;
 int timer0_flag = 0;
+
 int timer1_counter = 0;
 int timer1_flag = 0;
+
+int timer2_counter = 0;
+int timer2_flag = 0;
 
 /* USER CODE END PV */
 
@@ -76,6 +80,7 @@ void updateLEDMatrix(int);
 
 void setTimer0(int);
 void setTimer1(int);
+void setTimer2(int);
 void timer_run(void);
 /* USER CODE END PFP */
 
@@ -121,6 +126,8 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   setTimer0(10);
   setTimer1(10);
+  setTimer2(10);
+
   HAL_GPIO_WritePin(ROW_PORT, ROW0|ROW1|ROW2|ROW3|ROW4|ROW5|ROW6|ROW7, 1);
   HAL_GPIO_WritePin(ENM_PORT, ENM0|ENM1|ENM2|ENM3|ENM4|ENM5|ENM6|ENM7, 1);
 
@@ -154,6 +161,10 @@ int main(void)
 
 		  update7SEG(index_led++);
 		  if(index_led == MAX_LED) index_led = 0;
+	  }
+	  if(timer2_flag) {
+		  timer2_flag = 0;
+		  setTimer2(10);
 
 		  updateLEDMatrix(index_led_matrix++);
 		  if(index_led_matrix == MAX_LED_MATRIX) index_led_matrix = 0;
@@ -386,6 +397,10 @@ void setTimer1(int duration) {
 	timer1_counter = duration / TIMER_CYCLE;
 	timer1_flag = 0;
 }
+void setTimer2(int duration) {
+	timer2_counter = duration / TIMER_CYCLE;
+	timer2_flag = 0;
+}
 
 void timer_run() {
 	if(timer0_counter > 0) {
@@ -399,6 +414,13 @@ void timer_run() {
 		timer1_counter--;
 		if(timer1_counter == 0) {
 			timer1_flag = 1;
+		}
+	}
+
+	if(timer2_counter > 0) {
+		timer2_counter--;
+		if(timer2_counter == 0) {
+			timer2_flag = 1;
 		}
 	}
 }
