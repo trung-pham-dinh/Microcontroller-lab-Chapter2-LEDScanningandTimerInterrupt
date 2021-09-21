@@ -261,20 +261,28 @@ void display7SEG(int num) {
 }
 
 int counter = 1;
+int counter2 = 1;
 int led = 0;
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*htim) {
 	counter--;
+	counter2--;
 	if(counter == 0) {
 		counter = 100;
 		HAL_GPIO_TogglePin(RLED_PORT, RLED1);
-		display7SEG(4);
+	}
+	if(counter2 == 0) {
+		counter2 = 50;
 		if(led == 0) {
 			led = 1;
+
+			display7SEG(1);
 			HAL_GPIO_WritePin(EN_PORT, EN0, 0);
 			HAL_GPIO_WritePin(EN_PORT, EN1, 1);
 		}
 		else if(led == 1){
 			led = 0;
+
+			display7SEG(2);
 			HAL_GPIO_WritePin(EN_PORT, EN0, 1);
 			HAL_GPIO_WritePin(EN_PORT, EN1, 0);
 		}
