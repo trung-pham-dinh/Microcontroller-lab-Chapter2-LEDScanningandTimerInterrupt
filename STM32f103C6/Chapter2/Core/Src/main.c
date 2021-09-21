@@ -120,6 +120,7 @@ int main(void)
 		  setTimer0(1000);
 
 		  HAL_GPIO_TogglePin(DOT_PORT, DOT);
+		  HAL_GPIO_TogglePin(RLED_PORT, RLED1);
 
 		  second++;
 		  if(second >= 60) {
