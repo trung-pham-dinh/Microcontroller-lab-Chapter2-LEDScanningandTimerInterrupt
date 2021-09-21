@@ -329,6 +329,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef*htim) {
 	if(mil_1000 == 0) {
 		mil_1000 = 100;
 		HAL_GPIO_TogglePin(DOT_PORT, DOT);
+		HAL_GPIO_TogglePin(RLED_PORT, RLED1);
 	}
 }
 /* USER CODE END 4 */

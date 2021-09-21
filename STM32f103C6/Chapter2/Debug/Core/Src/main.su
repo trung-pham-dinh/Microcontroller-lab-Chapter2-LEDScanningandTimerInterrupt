@@ -6,4 +6,4 @@ main.c:253:6:display7SEG	16	static
 main.c:291:6:update7SEG	16	static
 main.c:313:6:updateClockBuffer	4	static
 main.c:320:6:HAL_TIM_PeriodElapsedCallback	16	static
-main.c:340:6:Error_Handler	4	static,ignoring_inline_asm
+main.c:341:6:Error_Handler	4	static,ignoring_inline_asm
