@@ -43,6 +43,10 @@
 TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
+static uint8_t seg7Hex[] = {0x01, 0x4F, 0x12, 0x06, 0x4C, 0x24, 0x20, 0x0F, 0x00, 0x04, 0xff};
+static uint16_t seg7Port[7] = {SEG0, SEG1, SEG2, SEG3, SEG4, SEG5, SEG6};
+static uint16_t seg7En[4] = {EN0, EN1, EN2, EN3};
+
 const int MAX_LED = 4;
 int index_led = 0;
 int led_buffer [4] = {0, 0, 0, 0};
@@ -321,60 +325,15 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 void display7SEG(int num) {
 	HAL_GPIO_WritePin(SEG_PORT, SEG0 | SEG1 | SEG2 | SEG3 | SEG4 | SEG5 | SEG6, 1);
-		switch(num) {
-		case 0:
-			HAL_GPIO_WritePin(SEG_PORT, SEG0 | SEG1 | SEG2 | SEG3 | SEG4 | SEG5, 0);
-			break;
-		case 1:
-			HAL_GPIO_WritePin(SEG_PORT, SEG1 | SEG2, 0);
-			break;
-		case 2:
-			HAL_GPIO_WritePin(SEG_PORT, SEG0 | SEG1 | SEG3 | SEG4 | SEG6, 0);
-			break;
-		case 3:
-			HAL_GPIO_WritePin(SEG_PORT, SEG0 | SEG1 | SEG2 | SEG3 | SEG6, 0);
-			break;
-		case 4:
-			HAL_GPIO_WritePin(SEG_PORT, SEG1 | SEG2 | SEG5 | SEG6, 0);
-			break;
-		case 5:
-			HAL_GPIO_WritePin(SEG_PORT, SEG0 | SEG2 | SEG3 | SEG5 | SEG6, 0);
-			break;
-		case 6:
-			HAL_GPIO_WritePin(SEG_PORT, SEG0 | SEG2 | SEG3 | SEG4 | SEG5 | SEG6, 0);
-			break;
-		case 7:
-			HAL_GPIO_WritePin(SEG_PORT, SEG0 | SEG1 | SEG2, 0);
-			break;
-		case 8:
-			HAL_GPIO_WritePin(SEG_PORT, SEG0 | SEG1 | SEG2 | SEG3 | SEG4 | SEG5 | SEG6, 0);
-			break;
-		case 9:
-			HAL_GPIO_WritePin(SEG_PORT, SEG0 | SEG1 | SEG2 | SEG3 | SEG5 | SEG6, 0);
-			break;
-		}
+	for(int i = 0; i < 7; i++) {
+		HAL_GPIO_WritePin(SEG_PORT, seg7Port[i], seg7Hex[num] & (0x40 >> i));
+	}
 }
 
 void update7SEG(int index) {
 	HAL_GPIO_WritePin(EN_PORT, EN0 | EN1 | EN2 | EN3, 1);
 	display7SEG(led_buffer[index]);
-
-	switch(index) {
-	case 0:
-		HAL_GPIO_WritePin(EN_PORT, EN0, 0);
-		break;
-	case 1:
-		HAL_GPIO_WritePin(EN_PORT, EN1, 0);
-		break;
-	case 2:
-		HAL_GPIO_WritePin(EN_PORT, EN2, 0);
-		break;
-	case 3:
-		HAL_GPIO_WritePin(EN_PORT, EN3, 0);
-		break;
-	default:
-		break;
-	}
+	HAL_GPIO_WritePin(EN_PORT, seg7En[index], 0);
 }
 
 void updateLEDMatrix(int index) {
@@ -393,7 +352,7 @@ void shiftLeftMatrix() {
 	static int shamt = 0;
 
 	for(int i = 0; i < MAX_LED_MATRIX; i++) {
-		if(i+shamt < MAX_LED_MATRIX) {
+		if(i+shamt >= 0 && i+shamt < MAX_LED_MATRIX) {
 			matrix_buffer[i] = charA[i+shamt];
 		}
 		else {
@@ -403,7 +362,7 @@ void shiftLeftMatrix() {
 
 	shamt++;
 	if(shamt == MAX_LED_MATRIX) {
-		shamt = 0;
+		shamt = -7;
 	}
 }
 
