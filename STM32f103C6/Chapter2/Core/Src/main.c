@@ -63,7 +63,7 @@ uint16_t col_pin[8] = {ENM0,ENM1,ENM2,ENM3,ENM4,ENM5,ENM6,ENM7};
 
 
 
-int TIMER_CYCLE = 1;
+int TIMER_CYCLE;
 
 int timer0_counter = 0;
 int timer0_flag = 0;
@@ -133,9 +133,11 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  setTimer0(10);
-  setTimer1(10);
-  setTimer2(10);
+
+  setTimer0(TIMER_CYCLE);
+  setTimer1(TIMER_CYCLE);
+  setTimer2(TIMER_CYCLE);
+  updateClockBuffer();
 
   HAL_GPIO_WritePin(ROW_PORT, ROW0|ROW1|ROW2|ROW3|ROW4|ROW5|ROW6|ROW7, 1);
   HAL_GPIO_WritePin(ENM_PORT, ENM0|ENM1|ENM2|ENM3|ENM4|ENM5|ENM6|ENM7, 1);
@@ -264,7 +266,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM2_Init 2 */
-
+  	TIMER_CYCLE = ((htim2.Init.Prescaler+1) * (htim2.Init.Period+1) / 8000);
   /* USER CODE END TIM2_Init 2 */
 
 }
