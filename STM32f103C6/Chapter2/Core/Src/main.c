@@ -27,7 +27,7 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+#define NO_OF_TIMERS 3
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -65,14 +65,8 @@ uint16_t col_pin[8] = {ENM0,ENM1,ENM2,ENM3,ENM4,ENM5,ENM6,ENM7};
 
 int TIMER_CYCLE;
 
-int timer0_counter = 0;
-int timer0_flag = 0;
-
-int timer1_counter = 0;
-int timer1_flag = 0;
-
-int timer2_counter = 0;
-int timer2_flag = 0;
+int timer_counter[NO_OF_TIMERS];
+int timer_flag[NO_OF_TIMERS];
 
 /* USER CODE END PV */
 
@@ -87,9 +81,7 @@ void display7SEG(int);
 void updateLEDMatrix(int);
 void shiftLeftMatrix(void);
 
-void setTimer0(int);
-void setTimer1(int);
-void setTimer2(int);
+void setTimer(int, int);
 void timer_run(void);
 /* USER CODE END PFP */
 
@@ -134,9 +126,9 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  setTimer0(TIMER_CYCLE);
-  setTimer1(TIMER_CYCLE);
-  setTimer2(TIMER_CYCLE);
+  setTimer(0,TIMER_CYCLE);
+  setTimer(1,TIMER_CYCLE);
+  setTimer(2,TIMER_CYCLE);
   updateClockBuffer();
 
   HAL_GPIO_WritePin(ROW_PORT, ROW0|ROW1|ROW2|ROW3|ROW4|ROW5|ROW6|ROW7, 1);
@@ -146,9 +138,9 @@ int main(void)
   HAL_GPIO_WritePin(ENM_PORT, ENM7, 0);
   while (1)
   {
-	  if(timer0_flag) {
-		  timer0_flag = 0;
-		  setTimer0(1000);
+	  if(timer_flag[0]) {
+		  timer_flag[0] = 0;
+		  setTimer(0,1000);
 
 		  HAL_GPIO_TogglePin(DOT_PORT, DOT);
 		  HAL_GPIO_TogglePin(RLED_PORT, RLED1);
@@ -167,17 +159,17 @@ int main(void)
 		  }
 		  updateClockBuffer();
 	  }
-	  if(timer1_flag) {
-		  timer1_flag = 0;
-		  setTimer1(250);
+	  if(timer_flag[1]) {
+		  timer_flag[1] = 0;
+		  setTimer(1,250);
 
 		  shiftLeftMatrix();
 		  update7SEG(index_led++);
 		  if(index_led == MAX_LED) index_led = 0;
 	  }
-	  if(timer2_flag) {
-		  timer2_flag = 0;
-		  setTimer2(3);
+	  if(timer_flag[2]) {
+		  timer_flag[2] = 0;
+		  setTimer(2,3);
 
 
 		  updateLEDMatrix(index_led_matrix++);
@@ -375,38 +367,18 @@ void updateClockBuffer() {
 	led_buffer[3] = minute % 10;
 }
 
-void setTimer0(int duration) {
-	timer0_counter = duration / TIMER_CYCLE;
-	timer0_flag = 0;
-}
-void setTimer1(int duration) {
-	timer1_counter = duration / TIMER_CYCLE;
-	timer1_flag = 0;
-}
-void setTimer2(int duration) {
-	timer2_counter = duration / TIMER_CYCLE;
-	timer2_flag = 0;
+void setTimer(int timer, int duration) {
+	timer_counter[timer] = duration / TIMER_CYCLE;
+	timer_flag[timer] = 0;
 }
 
 void timer_run() {
-	if(timer0_counter > 0) {
-		timer0_counter--;
-		if(timer0_counter == 0) {
-			timer0_flag = 1;
-		}
-	}
-
-	if(timer1_counter > 0) {
-		timer1_counter--;
-		if(timer1_counter == 0) {
-			timer1_flag = 1;
-		}
-	}
-
-	if(timer2_counter > 0) {
-		timer2_counter--;
-		if(timer2_counter == 0) {
-			timer2_flag = 1;
+	for(int i = 0; i < NO_OF_TIMERS; i++) {
+		if(timer_counter[i] > 0) {
+			timer_counter[i]--;
+			if(timer_counter[i] == 0) {
+				timer_flag[i] = 1;
+			}
 		}
 	}
 }
